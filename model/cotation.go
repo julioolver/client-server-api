@@ -1,19 +1,18 @@
 package model
 
+import "time"
+
 type Cotation struct {
-	Code       string `json:"code"`
-	Codein     string `json:"codein"`
-	Name       string `json:"name"`
-	High       string `json:"high"`
-	Low        string `json:"low"`
-	VarBid     string `json:"varBid"`
-	PctChange  string `json:"pctChange"`
-	Bid        string `json:"bid"`
-	Ask        string `json:"ask"`
-	Timestamp  string `json:"timestamp"`
-	CreateDate string `json:"create_date"`
+	Code      string  `json:"code"`
+	Name      string  `json:"name"`
+	Bid       float64 `json:"bid"`
+	Timestamp string  `json:"timestamp"`
 }
 
-func NewCotation() *Cotation {
-	return &Cotation{}
+func NewCotation(name string, bid float64) *Cotation {
+	return &Cotation{
+		Name:      name,
+		Bid:       bid,
+		Timestamp: time.Now().Format("y-m-d h:m"),
+	}
 }

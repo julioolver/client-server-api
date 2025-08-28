@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/julioolver/client-server-api/service"
+	"github.com/julioolver/client-server-api/model"
 )
 
 type responseEnvelope struct {
@@ -29,29 +29,29 @@ type QuotationResponse struct {
 	CreateDate string `json:"create_date"`
 }
 
-func GetCotation(ctx context.Context) (service.Quote, error) {
+func GetCotation(ctx context.Context) (model.Quote, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
 
 	if err != nil {
-		return service.Quote{}, err
+		return model.Quote{}, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		return service.Quote{}, err
+		return model.Quote{}, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return service.Quote{}, fmt.Errorf("status %d", resp.StatusCode)
+		return model.Quote{}, fmt.Errorf("status %d", resp.StatusCode)
 	}
 
 	var data responseEnvelope
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return service.Quote{}, err
+		return model.Quote{}, err
 	}
 
 	bidConverted, err := strconv.ParseFloat(data.Currency.Bid, 64)
@@ -60,7 +60,7 @@ func GetCotation(ctx context.Context) (service.Quote, error) {
 		bidConverted = 0
 	}
 
-	return service.Quote{
+	return model.Quote{
 		Base:      data.Currency.Bid,
 		Bid:       bidConverted,
 		Quote:     "",

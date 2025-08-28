@@ -5,22 +5,23 @@ import (
 
 	"github.com/julioolver/client-server-api/db"
 	"github.com/julioolver/client-server-api/repository"
+	"github.com/julioolver/client-server-api/service"
 )
 
 type QuotationDi struct {
-	QuotationRepo *repository.QuotationRepository
+	service *service.QuotationService
 }
 
 func (QuotationDi) NewQuotationDi() *QuotationDi {
 	db, err := db.ConnectDB()
 
 	if err != nil {
-		log.Fatal(db)
+		log.Fatal(err)
 	}
 
-	var di QuotationDi
-
-	*di.QuotationRepo = *repository.NewCotationRepository(db)
+	di := QuotationDi{
+		service: service.NewQuotationService(repository.NewCotationRepository(db)),
+	}
 
 	return &di
 }
