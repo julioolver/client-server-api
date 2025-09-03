@@ -9,10 +9,10 @@ import (
 )
 
 type QuotationDi struct {
-	service *service.QuotationService
+	Service *service.QuotationService
 }
 
-func (QuotationDi) NewQuotationDi() *QuotationDi {
+func NewQuotationDi() *QuotationDi {
 	db, err := db.ConnectDB()
 
 	if err != nil {
@@ -20,7 +20,7 @@ func (QuotationDi) NewQuotationDi() *QuotationDi {
 	}
 
 	di := QuotationDi{
-		service: service.NewQuotationService(repository.NewCotationRepository(db)),
+		Service: service.NewQuotationService(repository.NewCotationRepository(db)),
 	}
 
 	return &di

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/julioolver/client-server-api/client"
@@ -17,23 +18,24 @@ func NewQuotationService(repo model.QuotationRepository) *QuotationService {
 }
 
 func (quotationService *QuotationService) GetCotation(ctx context.Context) (*model.Cotation, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*400)
+	clientCtx, cancelClient := context.WithTimeout(ctx, time.Millisecond*200)
 
-	quote, err := client.GetCotation(ctx)
+	quote, err := client.GetCotation(clientCtx)
 
-	cancel()
-
-	if err != nil {
-		return nil, err
-	}
-
-	cotation := model.NewCotation(quote.Base, quote.Bid)
-
-	err = quotationService.Repository.Create(cotation)
+	cancelClient()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return cotation, nil
+	cotationModel := model.NewCotation(quote.Base, quote.Bid)
+
+	ctxDB, cancelDB := context.WithTimeout(ctx, time.Millisecond*10)
+	defer cancelDB()
+
+	if err := quotationService.Repository.Create(ctxDB, cotationModel); err != nil {
+		log.Printf("[WARN] não foi possível salvar cotação %s: %v", cotationModel.Id, err)
+	}
+
+	return cotationModel, nil
 }
